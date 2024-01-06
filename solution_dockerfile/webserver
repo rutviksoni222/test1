@@ -1,0 +1,33 @@
+# Use Ubuntu 14.04 LTS as the base image
+FROM ubuntu:14.04
+
+# Update packages and install necessary tools
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y git python3-pip python2.7 python2.7-dev wget
+
+# Clone the repository
+RUN git clone https://gitlab.com/crest1/devops_test.git /opt/devops_test
+
+# Install Apache version 2.4.7
+RUN apt-get install -y apache2=2.4.7-1ubuntu4.22
+
+# Install Python package
+RUN pip3 install pymysql
+
+# Configure Apache
+RUN sudo a2dismod mpm_event && \
+    sudo a2enmod mpm_prefork cgi && \
+    sudo service apache2 restart
+
+# Download Apache configuration files
+RUN wget "https://s3.amazonaws.com/richbourg-s3/mtwa/web/000-default.conf" && \
+    wget "https://s3.amazonaws.com/richbourg-s3/mtwa/web/ports.conf" && \
+    sudo cp 000-default.conf /etc/apache2/sites-enabled/ && \
+    sudo cp ports.conf /etc/apache2/
+
+# Restart Apache after configuration
+RUN sudo service apache2 restart && \
+    cd /opt/devops_test && \
+    sudo bash install.sh

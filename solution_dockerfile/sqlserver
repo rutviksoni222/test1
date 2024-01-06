@@ -1,0 +1,20 @@
+# Use Ubuntu 14.04 LTS as the base image
+FROM ubuntu:14.04
+
+# Update packages and install necessary tools
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y mysql-server wget
+
+# Download SQL file and copy to root directory
+RUN wget "https://gitlab.com/crest1/devops_test/-/raw/master/sql/create_db_table.sql" -O /root/create_db_table.sql
+
+# Start MySQL service, execute SQL file, and restart MySQL
+RUN service mysql start && \
+    mysql < /root/create_db_table.sql && \
+    sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = */g' /etc/mysql/my.cnf && \
+    service mysql restart
+
+# Start MySQL service on container start
+CMD ["service", "mysql", "restart"]
