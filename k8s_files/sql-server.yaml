@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql-server
+  template:
+    metadata:
+      labels:
+        app: sql-server
+    spec:
+      containers:
+      - name: sql-server
+        image: rsoni9898/sql-server:latest
+        command: 
+          - /bin/sh
+          - -c
+          - |
+            service mysql restart
+            sleep infinity
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-server-service
+spec:
+  selector:
+    app: sql-server
+  ports:
+    - protocol: TCP
+      port: 3306  # Assuming MySQL uses default port 3306
+      targetPort: 3306

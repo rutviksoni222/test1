@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-server
+  template:
+    metadata:
+      labels:
+        app: app-server
+    spec:
+      containers:
+      - name: app-server
+        image: rsoni9898/app-server:latest
+        ports:
+        - containerPort: 8080
+        command: 
+          - /bin/sh
+          - -c
+          - |
+            service apache2 restart
+            sleep infinity
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-server-service
+spec:
+  selector:
+    app: app-server
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

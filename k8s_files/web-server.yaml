@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      containers:
+      - name: web-server
+        image: rsoni9898/web-server:latest
+        ports:
+        - containerPort: 80
+        command: 
+          - /bin/sh
+          - -c
+          - |
+            service apache2 restart
+            sleep infinity
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  selector:
+    app: web-server
+  ports:
+    - protocol: TCP
+      port: 80   # Port exposed by the web pods
+      targetPort: 80 # Port on which the web pods are listening
+
